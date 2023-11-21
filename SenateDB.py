@@ -10,15 +10,14 @@ class SenateData(SqlBase):
 
     # Get list of speakers
     def getspeakerlist(self):
-        query = "select distinct(speaker) from transcriptlines order by speaker"
+        query = "select id, speakername from code_speakernames order by speakername"
         return self.select_all(query)
 
 
     #  Get ids of textlines for specific speaker
-    def getspeakertextlineids(self, speaker):
+    def getspeakertextlineids(self, speakerid):
 
-        speakername = self.preprocess_singlequotes(speaker)
-        query = "select id from transcriptlines where speaker='{0}' order by id".format(speakername)
+        query = "select id from transcriptlines where speakerid={0} order by id".format(speakerid)
         return self.select_all(query)
 
 

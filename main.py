@@ -92,11 +92,11 @@ if __name__ == '__main__':
     # Iterate through speakers
     for speaker in speakers:
 
-        print("Processing '{0}'".format(speaker['speaker']))
+        print("Processing '{0}'".format(speaker['speakername']))
 
         speakerwordcounts = Counter()
 
-        transcriptlineids = sdb.getspeakertextlineids(speaker['speaker'])
+        transcriptlineids = sdb.getspeakertextlineids(speaker['id'])
 
         # Iterate through speaker lines getting sentences
         for lineid in transcriptlineids:
@@ -118,7 +118,7 @@ if __name__ == '__main__':
                 # sentences = list()
 
         # open a file, where you ant to store the data
-        filename = "/home/dgraper/Documents/Senate Speaker Pickles/{0}.txt".format(speaker['speaker'])
+        filename = "/home/dgraper/Documents/Senate Speaker Pickles/{0}.txt".format(speaker['speakername'])
         filename = filename.replace(" ", "_")
         file = open(filename, 'wb')
 

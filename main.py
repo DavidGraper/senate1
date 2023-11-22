@@ -1,6 +1,10 @@
 import spacy
 import os
 import pickle
+import glob
+import re
+
+import createspeakerpickles
 
 from collections import Counter
 
@@ -83,110 +87,94 @@ if __name__ == '__main__':
     # introduction_doc = nlp("This tutorial is about Natural Language Processing in spacy.  The"
     #                        " quick brown fox jumped over the lazy dog's back.")
 
-    sdb = SenateDB.SenateData()
+    # createspeakerpickles()
 
-    # Get list of speakers
-    speakers = sdb.getspeakerlist()
-
-
-    # Iterate through speakers
-    for speaker in speakers:
-
-        print("Processing '{0}'".format(speaker['speakername']))
-
-        speakerwordcounts = Counter()
-
-        transcriptlineids = sdb.getspeakertextlineids(speaker['id'])
-
-        # Iterate through speaker lines getting sentences
-        for lineid in transcriptlineids:
-            transcriptline = sdb.gettranscriptline(lineid['id'])
-
-            # Break into sentences
-            transcriptlinetext = transcriptline[0]['text']
-            speakertext = nlp(transcriptlinetext)
-
-            sentences = speakertext.sents
-            for sentence in sentences:
-                # print(sentence)
-
-                sentence_txt = nlp(sentence.text)
-                words = [token.text for token in sentence_txt if not token.is_stop and not token.is_punct]
-                sentence_words = Counter(words)
-
-                speakerwordcounts += sentence_words
-                # sentences = list()
-
-        # open a file, where you ant to store the data
-        filename = "/home/dgraper/Documents/Senate Speaker Pickles/{0}.txt".format(speaker['speakername'])
-        filename = filename.replace(" ", "_")
-        file = open(filename, 'wb')
-
-        # dump information to that file
-        pickle.dump(speakerwordcounts, file)
-
-        # close the file
-        file.close()
+    # exit()
 
     exit()
-    file = 'krueger.txt'
-    file_text = open(file).read()
 
-    introduction_doc = nlp(file_text)
+    filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SENATOR_KRUEGER.txt"
 
-    sentences = list(introduction_doc.sents)
+    file = open(filename, 'rb')
+    senatorwordcounts = pickle.load(file)
+    file.close()
 
-    sum1 = Counter()
+    # Remove the most common Senator words from Liz Krueger's most common Senator words
+    for mostcommonword in mostcommon:
+        commonword = mostcommonword[0]
+        del senatorwordcounts[commonword]
 
-    for sentence in sentences:
-        print(sentence)
+    senatormostcommonwords = senatorwordcounts.most_common(50)
 
-        sentence_doc = nlp(sentence.text)
+    exit()
 
-        words = [token.text for token in sentence_doc if not token.is_stop and not token.is_punct]
 
-        temp1 = Counter(words)
-
-        sum1 += temp1
-
-        # for token in sentence_doc:
-        #     print(
-        #         f"{str(token.text_with_ws):22}"
-        #         f"{str(token.is_alpha):15}"
-        #         f"{str(token.is_punct):18}"
-        #         f"{str(token.is_stop)}"
-        #     )
-
-    print(
-        f"{'Text with Whitespace':22}"
-        f"{'Is Alphanumeric?':15}"
-        f"{'Is Punctuation?':18}"
-        f"{'Is Stop Word?'}"
-    )
-
+    # file = 'krueger.txt'
+    # file_text = open(file).read()
+    #
+    # introduction_doc = nlp(file_text)
+    #
+    # sentences = list(introduction_doc.sents)
+    #
+    # sum1 = Counter()
+    #
+    # for sentence in sentences:
+    #     print(sentence)
+    #
+    #     sentence_doc = nlp(sentence.text)
+    #
+    #     words = [token.text for token in sentence_doc if not token.is_stop and not token.is_punct]
+    #
+    #     temp1 = Counter(words)
+    #
+    #     sum1 += temp1
+    #
+    #     # for token in sentence_doc:
+    #     #     print(
+    #     #         f"{str(token.text_with_ws):22}"
+    #     #         f"{str(token.is_alpha):15}"
+    #     #         f"{str(token.is_punct):18}"
+    #     #         f"{str(token.is_stop)}"
+    #     #     )
+    #
     # print(
-    #     # f"{"Text with Whitespace":22}"
-    #     # f"{"Is Alphanumeric?":15}"
-    #     # f"{"Is Punctuation?":18}"
-    #     # f"{"Is Stop Word?"}"
+    #     f"{'Text with Whitespace':22}"
+    #     f"{'Is Alphanumeric?':15}"
+    #     f"{'Is Punctuation?':18}"        # open a file, where you ant to store the data
+    #     filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/{0}.txt".format(speaker['speakername'])
+    #     file = open(filename, 'wb')
+    #
+    #     # dump information to that file
+    #     pickle.dump(speakerwordcounts, file)
+    #
+    #     # close the file
+    #     file.close()
+    #     f"{'Is Stop Word?'}"
     # )
-
-    for token in introduction_doc:
-        print(
-            f"{str(token.text_with_ws):22}"
-            f"{str(token.is_alpha):15}"
-            f"{str(token.is_punct):18}"
-            f"{str(token.is_stop)}"
-        )
-
+    #
+    # # print(
+    # #     # f"{"Text with Whitespace":22}"
+    # #     # f"{"Is Alphanumeric?":15}"
+    # #     # f"{"Is Punctuation?":18}"
+    # #     # f"{"Is Stop Word?"}"
+    # # )
+    #
     # for token in introduction_doc:
-    #     if not token.is_stop:
-    #         if not token.is_punct:
-    #             if token.is_alpha:
-    #                 print(token.text_with_ws)
-
-    words = [token.text for token in introduction_doc if not token.is_stop and not token.is_punct]
-
-    temp1 = Counter(words)
-
-    print(Counter(words).most_common(20))
+    #     print(
+    #         f"{str(token.text_with_ws):22}"
+    #         f"{str(token.is_alpha):15}"
+    #         f"{str(token.is_punct):18}"
+    #         f"{str(token.is_stop)}"
+    #     )
+    #
+    # # for token in introduction_doc:
+    # #     if not token.is_stop:
+    # #         if not token.is_punct:
+    # #             if token.is_alpha:
+    # #                 print(token.text_with_ws)
+    #
+    # words = [token.text for token in introduction_doc if not token.is_stop and not token.is_punct]
+    #
+    # temp1 = Counter(words)
+    #
+    # print(Counter(words).most_common(20))

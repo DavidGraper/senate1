@@ -1,4 +1,4 @@
-def createmostcommonwordpickles()
+def createmostcommonwordpickles():
 
     filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SENATORS_ALL.txt"
 

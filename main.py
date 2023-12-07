@@ -1,3 +1,5 @@
+import json
+
 import spacy
 import os
 import pickle
@@ -5,6 +7,9 @@ import glob
 import re
 
 import createspeakerpickles
+import createmostcommonwords
+import createspeakerpickles
+import createallsenatorspickle
 
 from collections import Counter
 
@@ -18,163 +23,54 @@ def print_hi(name):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
 
-    # print(spacy.load("en_core_web_sm"))
-
     nlp = spacy.load("en_core_web_sm")
 
-    # nlp.vocab["Thank"].is_stop = True
-    # nlp.vocab["President"].is_stop = True
-    # nlp.vocab["bill"].is_stop = True
-    # nlp.vocab["Mr."].is_stop = True
-    # nlp.vocab["sponsor"].is_stop = True
-    # nlp.vocab["yield"].is_stop = True
-    # nlp.vocab["budget"].is_stop = True
-    # nlp.vocab["$"].is_stop = True
-    # nlp.vocab["bills"].is_stop = True
-    # nlp.vocab["continue"].is_stop = True
-    # nlp.vocab["Senator"].is_stop = True
-    # nlp.vocab["public"].is_stop = True
-    # nlp.vocab["questions"].is_stop = True
-    # nlp.vocab["million"].is_stop = True
-    # nlp.vocab["committee"].is_stop = True
-    # nlp.vocab["year"].is_stop = True
-    # nlp.vocab["New"].is_stop = True
-    # nlp.vocab["York"].is_stop = True
-    # nlp.vocab["floor"].is_stop = True
-    # nlp.vocab["believe"].is_stop = True
-    # nlp.vocab["billion"].is_stop = True
-    # nlp.vocab["process"].is_stop = True
-    # nlp.vocab["Senate"].is_stop = True
-    # nlp.vocab["record"].is_stop = True
-    # nlp.vocab["language"].is_stop = True
-    # nlp.vocab["right"].is_stop = True
-    # nlp.vocab["going"].is_stop = True
-    # nlp.vocab["procedure"].is_stop = True
-    # nlp.vocab["State"].is_stop = True
-    # nlp.vocab["vote"].is_stop = True
-    # nlp.vocab["information"].is_stop = True
-    # nlp.vocab["tonight"].is_stop = True
-    # nlp.vocab["amendment"].is_stop = True
-    # nlp.vocab["appreciate"].is_stop = True
-    # nlp.vocab["question"].is_stop = True
-    # nlp.vocab["parliamentary"].is_stop = True
-    # nlp.vocab["today"].is_stop = True
-    # nlp.vocab["know"].is_stop = True
-    # nlp.vocab["state"].is_stop = True
-    # nlp.vocab["available"].is_stop = True
-    # nlp.vocab["actually"].is_stop = True
-    # nlp.vocab["colleagues"].is_stop = True
-    # nlp.vocab["people"].is_stop = True
-    # nlp.vocab["Governor"].is_stop = True
-    # nlp.vocab["members"].is_stop = True
-    # nlp.vocab["conference"].is_stop = True
-    # nlp.vocab["appropriation"].is_stop = True
-    # nlp.vocab["development"].is_stop = True
-    # nlp.vocab["memo"].is_stop = True
-    # nlp.vocab["fact"].is_stop = True
-    # nlp.vocab["forward"].is_stop = True
-    # nlp.vocab["Majority"].is_stop = True
-    # nlp.vocab["debate"].is_stop = True
-    # nlp.vocab["years"].is_stop = True
-    # nlp.vocab["Minority"].is_stop = True
-    # nlp.vocab["proposed"].is_stop = True
-    # nlp.vocab["want"].is_stop = True
-    # nlp.vocab["new"].is_stop = True
-    # nlp.vocab["time"].is_stop = True
-    # nlp.vocab["think"].is_stop = True
-    # nlp.vocab["General"].is_stop = True
+    # # Create a pickle of each senator's most commonly used words
+    # createspeakerpickles.createspeakerpickles()
+    #
+    # # Create pickle of all senators' most commonly used words
+    # createallsenatorspickle.createallsenatorspickle()
+    #
+    # # Create a list of senators' most commonly used words after
+    # # removing the 760 most frequent words used by senators (this was a guesstimate
+    # # done by looking at the most frequent words used by all senators and seeing a break point around 760 where
+    # # the words were no longer just common conversational words)
 
-    # introduction_doc = nlp("This tutorial is about Natural Language Processing in spacy.  The"
-    #                        " quick brown fox jumped over the lazy dog's back.")
+    sdb = SenateDB.SenateData()
 
-    # createspeakerpickles()
+    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/mostcommonwords_SENATOR_*.txt"):
+        result = re.search(r"SENATOR_(.*)\.txt", filename)
+
+        # Hack for "Senator Craig Johnson"
+        temptext = result.group(1).replace("_", " ")
+
+        senatorname = "SENATOR {0}".format(temptext)
+
+        senatorid = sdb.getspeakerid(senatorname)
+
+        print("Processing most common words for '{0}'".format(senatorname))
+
+        # Hack
+        senatorname = senatorname.replace(" ","_")
+
+        # Create JSON objects for each senator's most common words pickles and write to database
+        filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/mostcommonwords_{0}.txt".format(senatorname)
+
+        file = open(filename, 'rb')
+        speakerwordcounts = pickle.load(file)
+        file.close()
+
+        jsontext = json.dumps(speakerwordcounts)
+
+        jsontext = jsontext.replace("[", "")
+        jsontext = jsontext.replace("]", "")
+
+        sdb = SenateDB.SenateData()
+
+        # Insert pickle data for senator
+        sdb.insertsenatormostcommonwords(senatorid["id"], jsontext)
 
     # exit()
 
     exit()
 
-    filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SENATOR_KRUEGER.txt"
-
-    file = open(filename, 'rb')
-    senatorwordcounts = pickle.load(file)
-    file.close()
-
-    # Remove the most common Senator words from Liz Krueger's most common Senator words
-    for mostcommonword in mostcommon:
-        commonword = mostcommonword[0]
-        del senatorwordcounts[commonword]
-
-    senatormostcommonwords = senatorwordcounts.most_common(50)
-
-    exit()
-
-
-    # file = 'krueger.txt'
-    # file_text = open(file).read()
-    #
-    # introduction_doc = nlp(file_text)
-    #
-    # sentences = list(introduction_doc.sents)
-    #
-    # sum1 = Counter()
-    #
-    # for sentence in sentences:
-    #     print(sentence)
-    #
-    #     sentence_doc = nlp(sentence.text)
-    #
-    #     words = [token.text for token in sentence_doc if not token.is_stop and not token.is_punct]
-    #
-    #     temp1 = Counter(words)
-    #
-    #     sum1 += temp1
-    #
-    #     # for token in sentence_doc:
-    #     #     print(
-    #     #         f"{str(token.text_with_ws):22}"
-    #     #         f"{str(token.is_alpha):15}"
-    #     #         f"{str(token.is_punct):18}"
-    #     #         f"{str(token.is_stop)}"
-    #     #     )
-    #
-    # print(
-    #     f"{'Text with Whitespace':22}"
-    #     f"{'Is Alphanumeric?':15}"
-    #     f"{'Is Punctuation?':18}"        # open a file, where you ant to store the data
-    #     filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/{0}.txt".format(speaker['speakername'])
-    #     file = open(filename, 'wb')
-    #
-    #     # dump information to that file
-    #     pickle.dump(speakerwordcounts, file)
-    #
-    #     # close the file
-    #     file.close()
-    #     f"{'Is Stop Word?'}"
-    # )
-    #
-    # # print(
-    # #     # f"{"Text with Whitespace":22}"
-    # #     # f"{"Is Alphanumeric?":15}"
-    # #     # f"{"Is Punctuation?":18}"
-    # #     # f"{"Is Stop Word?"}"
-    # # )
-    #
-    # for token in introduction_doc:
-    #     print(
-    #         f"{str(token.text_with_ws):22}"
-    #         f"{str(token.is_alpha):15}"
-    #         f"{str(token.is_punct):18}"
-    #         f"{str(token.is_stop)}"
-    #     )
-    #
-    # # for token in introduction_doc:
-    # #     if not token.is_stop:
-    # #         if not token.is_punct:
-    # #             if token.is_alpha:
-    # #                 print(token.text_with_ws)
-    #
-    # words = [token.text for token in introduction_doc if not token.is_stop and not token.is_punct]
-    #
-    # temp1 = Counter(words)
-    #
-    # print(Counter(words).most_common(20))

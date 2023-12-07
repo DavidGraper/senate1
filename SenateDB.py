@@ -39,3 +39,16 @@ class SenateData(SqlBase):
         query = "insert data_log (loggeddate, logtext) values ('{0}','{1}')".format(
             datetime.datetime.now().strftime("%Y-%m-%d %X"), logtext)
         return self.execute(query)
+
+    def insertsenatormostcommonwords(self, senatorid, jsontext):
+
+        jsontext = jsontext.replace("'", "")
+
+        query = "insert into data_mostcommonwords (senatorid, data) values ({0}, JSON_OBJECT({1}))".format(senatorid, jsontext)
+        return self.execute(query)
+
+
+    def getspeakerid(self, speakername):
+
+        query = "select id from code_speakernames where speakername='{0}'".format(speakername)
+        return self.select_one(query)

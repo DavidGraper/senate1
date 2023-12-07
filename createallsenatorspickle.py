@@ -3,7 +3,7 @@ import glob
 
 from collections import Counter
 
-def createallsenatorspickle()
+def createallsenatorspickle():
 
     sumspeakerwordcounts = Counter()
 

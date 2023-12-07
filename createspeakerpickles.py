@@ -1,7 +1,13 @@
 import pickle
+import SenateDB
+import spacy
+
+from collections import Counter
 
 
 def createspeakerpickles():
+
+    nlp = spacy.load("en_core_web_sm")
 
     sdb = SenateDB.SenateData()
 
@@ -15,34 +21,32 @@ def createspeakerpickles():
 
         speakerwordcounts = Counter()
 
+        # Fetch speaker's transcript lines from database
         transcriptlineids = sdb.getspeakertextlineids(speaker['id'])
 
-        # Iterate through speaker lines getting sentences
         for lineid in transcriptlineids:
             transcriptline = sdb.gettranscriptline(lineid['id'])
 
-            # Break into sentences
+            # Break each transcript line into sentences
             transcriptlinetext = transcriptline[0]['text']
             speakertext = nlp(transcriptlinetext)
 
             sentences = speakertext.sents
-            for sentence in sentences:
-                # print(sentence)
 
+            # Break each sentence into words
+            for sentence in sentences:
                 sentence_txt = nlp(sentence.text)
                 words = [token.text for token in sentence_txt if not token.is_stop and not token.is_punct]
+
+                # Get wordcount array for sentence
                 sentence_words = Counter(words)
 
+                # Add to wordcount array accumulator for speaker
                 speakerwordcounts += sentence_words
-                # sentences = list()
 
-        # open a file, where you ant to store the data
-        filename = "/home/dgraper/Documents/Senate Speaker Pickles/{0}.txt".format(speaker['speakername'])
+        # Save wordcounts for this speaker to pickle file
+        filename = "/home/dgraper/Documents/Senate Speaker Pickles/{0}_wordcount.pkl".format(speaker['speakername'])
         filename = filename.replace(" ", "_")
         file = open(filename, 'wb')
-
-        # dump information to that file
         pickle.dump(speakerwordcounts, file)
-
-        # close the file
         file.close()

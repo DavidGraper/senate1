@@ -6,7 +6,6 @@ import pickle
 import glob
 import re
 
-import createspeakerpickles
 import createmostcommonwords
 import createspeakerpickles
 import createallsenatorspickle
@@ -15,18 +14,35 @@ from collections import Counter
 
 import SenateDB
 
-
-def print_hi(name):
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
+# Start
 if __name__ == '__main__':
 
-    nlp = spacy.load("en_core_web_sm")
 
-    # # Create a pickle of each senator's most commonly used words
-    # createspeakerpickles.createspeakerpickles()
+    print("\n\nType in action you want to perform\n")
+    print("(1) To create wordcount pickle files for each speaker in database "
+          "(stored in /Documents/Senate_Speaker_Pickles/")
+    print("\tunder the name of each speaker using file-naming format '<speakername>.pkl')")
+    print("\t(WARNING:  This takes a very long time.)")
+    print("(2) To create wordcount pickle file for all speakers in database "
+          "(stored in /Documents/Senate_Speaker_Pickles/")
+    print("\tunder filename 'speakers_all.pkl')")
+    print("(3) To do task 3\n")
+    print("(0) To exit")
+
+    action = input()
+
+    if action == "1":
+
+        nlp = spacy.load("en_core_web_sm")
+
+        # Create a pickle of each senator's most commonly used words
+        createspeakerpickles.createspeakerpickles()
+
+        exit()
+
+    else:
+        exit()
+
     #
     # # Create pickle of all senators' most commonly used words
     # createallsenatorspickle.createallsenatorspickle()

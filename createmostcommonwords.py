@@ -1,15 +1,15 @@
 def createmostcommonwordpickles():
 
+    # Get wordcounts for all speakers in database
     filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SENATORS_ALL.txt"
-
     file = open(filename, 'rb')
     speakerwordcounts = pickle.load(file)
     mostcommon = speakerwordcounts.most_common(759)
     file.close()
 
-    # create most common word pickles for each senator
+    # Create a "Most Common Word" pickle file for each speaker
 
-    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/SENATOR_*.txt"):
+    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/*.txt"):
 
         result = re.search(r"SENATOR_(.*)\.txt", filename)
         senatorname = "SENATOR_{0}".format(result.group(1))
@@ -23,6 +23,8 @@ def createmostcommonwordpickles():
         for mostcommonword in mostcommon:
             commonword = mostcommonword[0]
             del senatorwordcounts[commonword]
+
+        # This is probably where I want to delete all names from code_speakernames
 
         senatormostcommonwords = senatorwordcounts.most_common(50)
 

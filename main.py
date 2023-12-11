@@ -27,7 +27,7 @@ if __name__ == '__main__':
           "(stored in /Documents/Senate_Speaker_Pickles/")
     print("\tunder filename 'speakers_all.pkl')")
     print("(3) To do task 3\n")
-    print("(0) To exit")
+    print("(0) To exit\n")
 
     action = input()
 

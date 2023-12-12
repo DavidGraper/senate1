@@ -1,3 +1,23 @@
+import SenateDB;
+
+
+def gettokensinspeakernamesfromdatabase():
+
+    sdb = SenateDB.SenateData()
+
+    speakerlist = sdb.getspeakerlist()
+
+    returnlist = []
+
+    for speaker in speakerlist:
+        tokens = speaker['speakername'].split()
+        for token in tokens:
+            if not token in returnlist:
+                returnlist.append(token)
+
+    return returnlist
+
+
 def createmostcommonwordpickles():
 
     # Get wordcounts for all speakers in database

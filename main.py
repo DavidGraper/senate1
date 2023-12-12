@@ -17,7 +17,6 @@ import SenateDB
 # Start
 if __name__ == '__main__':
 
-
     print("\n\nType in action you want to perform\n")
     print("(1) To create wordcount pickle files for each speaker in database "
           "(stored in /Documents/Senate_Speaker_Pickles/")
@@ -34,6 +33,14 @@ if __name__ == '__main__':
     if action == "1":
 
         nlp = spacy.load("en_core_web_sm")
+
+        # The names of speakers are tokens we want to ignore when generating speakers most common words (e.g.,
+        # an Acting President will rattle off the names of all the senators again and again and aren't what
+        # they're actually talking about), so define all of the tokens in the "speakername" table as stop words
+        speakernamestopwords = createmostcommonwords.gettokensinspeakernamesfromdatabase()
+
+        for stopword in speakernamestopwords:
+            nlp.Defaults.stop_words.add(stopword)
 
         # Create a pickle of each senator's most commonly used words
         createspeakerpickles.createspeakerpickles()

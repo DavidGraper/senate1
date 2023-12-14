@@ -1,0 +1,34 @@
+import pickle
+import SenateDB
+import glob
+
+
+def savemostcommonwordstodb():
+
+    sdb = SenateDB.SenateData()
+
+    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/*_mostcommonwords.txt"):
+        result = re.search(r"\/home\/dgraper\/Documents\/Senate_Speaker_Pickles\/(.*)_mostcommonwords\.txt", filename)
+
+        speakername = "{0}".format(temptext)
+
+        speakerid = sdb.getspeakerid(speakername)
+
+        print("Processing most common words for '{0}'".format(senatorname))
+
+        # Create JSON objects for each senator's most common words pickles and write to database
+        filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/{0}_mostcommonwords.txt".format(speakername)
+
+        file = open(filename, 'rb')
+        speakerwordcounts = pickle.load(file)
+        file.close()
+
+        jsontext = json.dumps(speakerwordcounts)
+
+        jsontext = jsontext.replace("[", "")
+        jsontext = jsontext.replace("]", "")
+
+        sdb = SenateDB.SenateData()
+
+        # Insert pickle data for senator
+        sdb.insertsenatormostcommonwords(senatorid["id"], jsontext)

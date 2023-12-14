@@ -40,11 +40,11 @@ class SenateData(SqlBase):
             datetime.datetime.now().strftime("%Y-%m-%d %X"), logtext)
         return self.execute(query)
 
-    def insertsenatormostcommonwords(self, senatorid, jsontext):
+    def insertspeakermostcommonwords(self, speakerid, jsontext):
 
         jsontext = jsontext.replace("'", "")
 
-        query = "insert into data_mostcommonwords (senatorid, data) values ({0}, JSON_OBJECT({1}))".format(senatorid, jsontext)
+        query = "insert into data_mostcommonwords (speakerid, data) values ({0}, JSON_OBJECT({1}))".format(speakerid, jsontext)
         return self.execute(query)
 
 
@@ -52,3 +52,13 @@ class SenateData(SqlBase):
 
         query = "select id from code_speakernames where speakername='{0}'".format(speakername)
         return self.select_one(query)
+
+
+    def insertspeakerunigram(self, speakerid, unigram, frequency):
+
+        query = "insert into data_ngrams (speakerid, token, frequency) values ({0}, '{1}', {2})".format(speakerid,
+                                                                                                        unigram,
+                                                                                                        frequency)
+        return self.execute(query)
+
+

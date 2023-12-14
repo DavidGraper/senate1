@@ -3,11 +3,11 @@ import glob
 
 from collections import Counter
 
-def createallsenatorspickle():
+def createallspeakerspickle():
 
     sumspeakerwordcounts = Counter()
 
-    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/SENATOR_*.txt"):
+    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/*.pkl"):
         print("Processing '{0}".format(filename))
 
         file = open(filename, 'rb')
@@ -15,7 +15,7 @@ def createallsenatorspickle():
         sumspeakerwordcounts = sumspeakerwordcounts + speakerwordcounts
         file.close()
 
-    filename = "/home/dgraper/Documents/Senate Speaker Pickles/SENATORS_ALL.txt"
+    filename = "/home/dgraper/Documents/Senate Speaker Pickles/SPEAKERS_ALL.pkl"
     filename = filename.replace(" ", "_")
     file = open(filename, 'wb')
 

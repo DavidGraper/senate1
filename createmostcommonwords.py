@@ -1,5 +1,7 @@
-import SenateDB;
-
+import pickle
+import SenateDB
+import glob
+import re
 
 def gettokensinspeakernamesfromdatabase():
 
@@ -21,39 +23,40 @@ def gettokensinspeakernamesfromdatabase():
 def createmostcommonwordpickles():
 
     # Get wordcounts for all speakers in database
-    filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SENATORS_ALL.txt"
+    filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/SPEAKERS_ALL.pkl"
     file = open(filename, 'rb')
     speakerwordcounts = pickle.load(file)
-    mostcommon = speakerwordcounts.most_common(759)
+
+    # Get the 759 most common words used by all speakers
+    mostcommonstopwords = speakerwordcounts.most_common(759)
     file.close()
 
-    # Create a "Most Common Word" pickle file for each speaker
+    # Create a "Most Common Word" pickle file for each speaker after removing mostcommonstopwords
+    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/*_wordcount.pkl"):
 
-    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/*.txt"):
+        result = re.search(r"\/home\/dgraper\/Documents\/Senate_Speaker_Pickles\/(.*)_wordcount\.pkl", filename)
+        speakername = "{0}".format(result.group(1))
 
-        result = re.search(r"SENATOR_(.*)\.txt", filename)
-        senatorname = "SENATOR_{0}".format(result.group(1))
-
-        print("Processing most common words for '{0}'".format(senatorname))
+        print("Processing most common words for '{0}'".format(speakername))
 
         file = open(filename, 'rb')
-        senatorwordcounts = pickle.load(file)
+        speakerwordcounts = pickle.load(file)
         file.close()
 
-        for mostcommonword in mostcommon:
-            commonword = mostcommonword[0]
-            del senatorwordcounts[commonword]
+        # Remove most common words used by all speakers -- done to reveal words more unique to each speaker
+        for commonword in mostcommonstopwords:
+            commonword = commonword[0]
+            del speakerwordcounts[commonword]
 
-        # This is probably where I want to delete all names from code_speakernames
+        # Select only the top 50 most common words
+        speakermostcommonwords = speakerwordcounts.most_common(50)
 
-        senatormostcommonwords = senatorwordcounts.most_common(50)
-
-        # open a file, where you want to store the data
-        filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/mostcommonwords_{0}.txt".format(senatorname)
+        # Open a file and store this data as a pickle
+        filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/{0}_mostcommonwords.pkl".format(speakername)
         file = open(filename, 'wb')
 
         # dump information to that file
-        pickle.dump(senatormostcommonwords, file)
+        pickle.dump(speakermostcommonwords, file)
 
         # close the file
         file.close()

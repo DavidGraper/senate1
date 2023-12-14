@@ -1,5 +1,3 @@
-import json
-
 import spacy
 import os
 import pickle
@@ -8,7 +6,9 @@ import re
 
 import createmostcommonwords
 import createspeakerpickles
-import createallsenatorspickle
+import createallspeakerspickle
+import generate_ngrams
+import savemostcommonwordstodb1
 
 from collections import Counter
 
@@ -22,10 +22,19 @@ if __name__ == '__main__':
           "(stored in /Documents/Senate_Speaker_Pickles/")
     print("\tunder the name of each speaker using file-naming format '<speakername>.pkl')")
     print("\t(WARNING:  This takes a very long time.)")
+
     print("(2) To create wordcount pickle file for all speakers in database "
-          "(stored in /Documents/Senate_Speaker_Pickles/")
+          "(stored in /Documents/Speaker_Pickles/")
     print("\tunder filename 'speakers_all.pkl')")
-    print("(3) To do task 3\n")
+
+    print("(3) Generate a list of most common words for speakers in database "
+          "(stored in /Documents/Speaker_Pickles/")
+    print("\tunder the name of each speaker using file-naming format '<speakername>_mostcommonwords.pkl')")
+
+    print("(4) Create JSON structures of each speaker's most common words and write to database")
+
+    print("(5) Generate unigrams, bigrams, and trigrams for speakers in database ")
+
     print("(0) To exit\n")
 
     action = input()
@@ -47,53 +56,42 @@ if __name__ == '__main__':
 
         exit()
 
+    elif action == "2":
+
+        nlp = spacy.load("en_core_web_sm")
+
+        # Create pickle of all senators' most commonly used words
+        createallspeakerspickle.createallspeakerspickle()
+
+        exit()
+
+    elif action == "3":
+
+        nlp = spacy.load("en_core_web_sm")
+
+        # Create most common words for speakers and save as pickles
+        createmostcommonwords.createmostcommonwordpickles()
+
+        exit()
+
+    elif action == "4":
+
+        nlp = spacy.load("en_core_web_sm")
+
+        # Create JSON lists from speakers' most-common-words pickles and save to database
+        savemostcommonwordstodb1.savemostcommonwordstodb()
+
+        exit()
+
+    elif action == "5":
+
+        generate_ngrams.generate_ngrams()
+
+        exit()
     else:
         exit()
 
     #
-    # # Create pickle of all senators' most commonly used words
-    # createallsenatorspickle.createallsenatorspickle()
-    #
-    # # Create a list of senators' most commonly used words after
-    # # removing the 760 most frequent words used by senators (this was a guesstimate
-    # # done by looking at the most frequent words used by all senators and seeing a break point around 760 where
-    # # the words were no longer just common conversational words)
 
-    sdb = SenateDB.SenateData()
 
-    for filename in glob.glob("/home/dgraper/Documents/Senate_Speaker_Pickles/mostcommonwords_SENATOR_*.txt"):
-        result = re.search(r"SENATOR_(.*)\.txt", filename)
-
-        # Hack for "Senator Craig Johnson"
-        temptext = result.group(1).replace("_", " ")
-
-        senatorname = "SENATOR {0}".format(temptext)
-
-        senatorid = sdb.getspeakerid(senatorname)
-
-        print("Processing most common words for '{0}'".format(senatorname))
-
-        # Hack
-        senatorname = senatorname.replace(" ","_")
-
-        # Create JSON objects for each senator's most common words pickles and write to database
-        filename = "/home/dgraper/Documents/Senate_Speaker_Pickles/mostcommonwords_{0}.txt".format(senatorname)
-
-        file = open(filename, 'rb')
-        speakerwordcounts = pickle.load(file)
-        file.close()
-
-        jsontext = json.dumps(speakerwordcounts)
-
-        jsontext = jsontext.replace("[", "")
-        jsontext = jsontext.replace("]", "")
-
-        sdb = SenateDB.SenateData()
-
-        # Insert pickle data for senator
-        sdb.insertsenatormostcommonwords(senatorid["id"], jsontext)
-
-    # exit()
-
-    exit()
 

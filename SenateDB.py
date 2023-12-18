@@ -56,6 +56,9 @@ class SenateData(SqlBase):
 
     def insertspeakerunigram(self, speakerid, unigram):
 
+        # Diagnostic
+        print("\tProcessing n-gram level 1")
+
         for entry in unigram:
 
             dbtoken = entry[0]
@@ -68,6 +71,9 @@ class SenateData(SqlBase):
 
 
     def insertspeakerngrams(self, speakerid, ngram, ngramlevel):
+
+        # Diagnostic
+        print("\tProcessing n-gram level {0}".format(str(ngramlevel)))
 
         # Break n-gram dict into a list
         for entry in ngram:

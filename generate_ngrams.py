@@ -22,24 +22,50 @@ def generate_ngrams():
         print("Processing {0}".format(speaker['speakername']))
 
         speakerunigrams = defaultdict(int)
+        speakerbigrams = defaultdict(int)
+        speakertrigrams = defaultdict(int)
+        speakerquadgrams = defaultdict(int)
+        speakerpentagrams = defaultdict(int)
 
         transcriptlineids = sdb.getspeakertextlineids(speaker["id"])
 
         for transcriptlineid in transcriptlineids:
             transcriptline = sdb.gettranscriptline(transcriptlineid['id'])
 
-    #         Get dictionary collection for this transcriptline
-            transcriptlineunigrams = getunigramdictionaries(transcriptline[0]['text'])
+            for sentence in nltk.sent_tokenize(transcriptline[0]['text']):
 
-            temp = dict(Counter(speakerunigrams) + Counter(transcriptlineunigrams))
+                sentenceunigrams = getngramdictionaries(sentence, 1)
+                sentencebigrams = getngramdictionaries(sentence, 2)
+                sentencetrigrams = getngramdictionaries(sentence, 3)
+                sentencequadgrams = getngramdictionaries(sentence, 4)
+                sentencepentagrams = getngramdictionaries(sentence, 5)
 
-            speakerunigrams = temp
+                # Load accumulated n-gram listings
+                speakerunigrams = dict(Counter(speakerunigrams) + Counter(sentenceunigrams))
+                speakerbigrams = dict(Counter(speakerbigrams) + Counter(sentencebigrams))
+                speakertrigrams = dict(Counter(speakertrigrams) + Counter(sentencetrigrams))
+                speakerquadgrams = dict(Counter(speakerquadgrams) + Counter(sentencequadgrams))
+                speakerpentagrams = dict(Counter(speakerpentagrams) + Counter(sentencepentagrams))
 
-    # Clear all n-gram entries for this user from database and write out new values
-        for speakerunigram in speakerunigrams:
-            sdb.insertspeakerunigram(speaker["id"], speakerunigram[0], speakerunigrams[speakerunigram])
+        # Once all transcript lines for this speaker have been processed, insert accumulator n-gram lists
+        # into database
+        sdb.insertspeakerunigram(speaker["id"], speakerunigrams)
+        sdb.insertspeakerngrams(speaker["id"], speakerbigrams, 2)
+        sdb.insertspeakerngrams(speaker["id"], speakertrigrams, 3)
+        sdb.insertspeakerngrams(speaker["id"], speakerquadgrams, 4)
+        sdb.insertspeakerngrams(speaker["id"], speakerpentagrams, 5)
 
-def getunigramdictionaries(textline):
+            # for speakertrigram in speakertrigrams:
+            #     sdb.insertspeakerngrams(speaker["id"], speakertrigrams, 3)
+            #
+            # for speakerbigram in speakerquadgrams:
+            #     sdb.insertspeakerngrams(speaker["id"], speakerquadgrams, 4)
+            #
+            # for speakertrigram in speakerpentagrams:
+            #     sdb.insertspeakerngrams(speaker["id"], speakerpentagrams, 5)
+
+
+def getngramdictionaries(textline, N):
 
     # Tokenize the text into words
     words = nltk.word_tokenize(textline)
@@ -49,7 +75,7 @@ def getunigramdictionaries(textline):
     # print(words)
 
     # Define the order of the N-gram model
-    N = 1
+    # N = 1
 
     # Create N-grams from the tokenized words
     ngrams_list = list(ngrams(words, N))
@@ -60,3 +86,5 @@ def getunigramdictionaries(textline):
         ngram_freq[ngram] += 1
 
     return ngram_freq
+
+

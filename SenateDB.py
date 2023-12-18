@@ -54,11 +54,38 @@ class SenateData(SqlBase):
         return self.select_one(query)
 
 
-    def insertspeakerunigram(self, speakerid, unigram, frequency):
+    def insertspeakerunigram(self, speakerid, unigram):
 
-        query = "insert into data_ngrams (speakerid, token, frequency) values ({0}, '{1}', {2})".format(speakerid,
-                                                                                                        unigram,
+        for entry in unigram:
+
+            dbtoken = entry[0]
+            frequency = unigram[entry]
+
+            query = "insert into data_ngrams (speakerid, token, frequency) values ({0}, '{1}', {2})".format(speakerid,
+                                                                                                        dbtoken,
                                                                                                         frequency)
-        return self.execute(query)
+            self.execute(query)
 
+
+    def insertspeakerngrams(self, speakerid, ngram, ngramlevel):
+
+        # Break n-gram dict into a list
+        for entry in ngram:
+
+            dbtoken = ""
+            for i in range(0,ngramlevel-1):
+                dbtoken += entry[i] + " "
+            dbtoken = dbtoken.strip()
+
+            dbnextword = entry[ngramlevel-1]
+
+        # for x in range(1, n-1):
+        #     token += " " + ngram[x]
+        #
+        # nextword = ngram[n-1]
+
+            query = "insert into data_ngrams (speakerid, token, nextword, " \
+                    "frequency) values ({0}, '{1}', '{2}', {3})".format(speakerid, dbtoken, dbnextword, ngram[entry])
+
+            self.execute(query)
 

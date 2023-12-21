@@ -4,13 +4,14 @@ from nltk import ngrams
 from collections import defaultdict
 from collections import Counter
 import random
+import datetime
 
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 
 
-def generate_ngrams():
+def generate_ngrams(startingwithspeakerid):
 
     sdb = SenateDB.SenateData()
 
@@ -19,7 +20,12 @@ def generate_ngrams():
 
     for speaker in speakerlist:
 
-        print("Processing {0}".format(speaker['speakername']))
+        if speaker['id'] < startingwithspeakerid:
+            continue
+
+        starttime = datetime.datetime.now()
+
+        print("Processing {0} starting at {1}".format(speaker['speakername'], starttime))
 
         speakerunigrams = defaultdict(int)
         speakerbigrams = defaultdict(int)
@@ -29,11 +35,28 @@ def generate_ngrams():
 
         transcriptlineids = sdb.getspeakertextlineids(speaker["id"])
 
+        transcriptlinecount = len(transcriptlineids)
+        counter = 0
+        percenttodisplay = 0
+
         for transcriptlineid in transcriptlineids:
+
+            # Diagnostic
+            transcriptlinestarttime = datetime.datetime.now()
+            counter += 1
+            percent = round((counter / transcriptlinecount) * 100)
+            elapsedtime = transcriptlinestarttime - starttime
+
+            # Display only integer percent increases
+            if (percenttodisplay != percent):
+                percenttodisplay = percent
+                print("Speaker = '{0}', percent processed = {1}, "
+                      "timeelapsed = {2}".format(speaker['speakername'], str(percenttodisplay),
+                                                 elapsedtime))
+
             transcriptline = sdb.gettranscriptline(transcriptlineid['id'])
 
             for sentence in nltk.sent_tokenize(transcriptline[0]['text']):
-
                 sentenceunigrams = getngramdictionaries(sentence, 1)
                 sentencebigrams = getngramdictionaries(sentence, 2)
                 sentencetrigrams = getngramdictionaries(sentence, 3)

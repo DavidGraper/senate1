@@ -85,7 +85,8 @@ if __name__ == '__main__':
 
     elif action == "5":
 
-        generate_ngrams.generate_ngrams()
+        # HACK:  Restarting with "SENATOR DOLLINGER"
+        generate_ngrams.generate_ngrams(507)
 
         exit()
     else:

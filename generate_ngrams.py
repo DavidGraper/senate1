@@ -97,16 +97,38 @@ def getngramdictionaries(textline, N):
     words = [word.lower() for word in words if word.isalnum()]
     # print(words)
 
-    # Define the order of the N-gram model
-    # N = 1
+    # Diagnostic - Define the order of the N-gram model
+    # N = 4
 
     # Create N-grams from the tokenized words
-    ngrams_list = list(ngrams(words, N))
+    ngrams_list = list(ngrams(words, N, pad_left=True, pad_right=True, left_pad_symbol='<s>', right_pad_symbol='</s>'))
 
     # Create a defaultdict to store N-grams and their frequency
     ngram_freq = defaultdict(int)
     for ngram in ngrams_list:
         ngram_freq[ngram] += 1
+
+    # Remove all n-grams with multiple start/end padding entries.  This only happens with tri, quad, and pentagrams
+    if N == 3:
+
+        # Delete first dictionary entry
+        ngram_freq.pop(next(iter(ngram_freq)))
+
+        # Delete last dictionary entry
+        ngram_freq.popitem()
+
+    elif N == 4:
+        ngram_freq.pop(next(iter(ngram_freq)))
+        ngram_freq.pop(next(iter(ngram_freq)))
+        ngram_freq.popitem()
+        ngram_freq.popitem()
+    elif N == 5:
+        ngram_freq.pop(next(iter(ngram_freq)))
+        ngram_freq.pop(next(iter(ngram_freq)))
+        ngram_freq.pop(next(iter(ngram_freq)))
+        ngram_freq.popitem()
+        ngram_freq.popitem()
+        ngram_freq.popitem()
 
     return ngram_freq
 

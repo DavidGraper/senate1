@@ -5,10 +5,23 @@ from collections import defaultdict
 from collections import Counter
 import random
 import datetime
+import string
 
 nltk.download('punkt')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
+
+
+def remove_punctuation(input_string):
+
+    # Make a translation table that maps all punctuation characters to None
+    # translator = str.maketrans("", "", string.punctuation)
+    translator = str.maketrans("!?.-", "    ")
+
+    # Apply the translation table to the input string
+    result = input_string.translate(translator)
+
+    return result
 
 
 def generate_ngrams(startingwithspeakerid):
@@ -57,18 +70,34 @@ def generate_ngrams(startingwithspeakerid):
             transcriptline = sdb.gettranscriptline(transcriptlineid['id'])
 
             for sentence in nltk.sent_tokenize(transcriptline[0]['text']):
+
+                # Get number of words in sentence and break into n-grams based on number of words
+
+                # First remove punctuation
+                sentence = remove_punctuation(sentence)
+
+                # Get count of words
+                words = nltk.word_tokenize(sentence)
+                sentencewordcount = len(words)
+
+                # Generate n-gram listing for this sentence
                 sentenceunigrams = getngramdictionaries(sentence, 1)
-                sentencebigrams = getngramdictionaries(sentence, 2)
-                sentencetrigrams = getngramdictionaries(sentence, 3)
-                sentencequadgrams = getngramdictionaries(sentence, 4)
-                sentencepentagrams = getngramdictionaries(sentence, 5)
 
                 # Load accumulated n-gram listings
                 speakerunigrams = dict(Counter(speakerunigrams) + Counter(sentenceunigrams))
-                speakerbigrams = dict(Counter(speakerbigrams) + Counter(sentencebigrams))
-                speakertrigrams = dict(Counter(speakertrigrams) + Counter(sentencetrigrams))
-                speakerquadgrams = dict(Counter(speakerquadgrams) + Counter(sentencequadgrams))
-                speakerpentagrams = dict(Counter(speakerpentagrams) + Counter(sentencepentagrams))
+
+                if sentencewordcount >= 2:
+                    sentencebigrams = getngramdictionaries(sentence, 2)
+                    speakerbigrams = dict(Counter(speakerbigrams) + Counter(sentencebigrams))
+                if sentencewordcount >= 3:
+                    sentencetrigrams = getngramdictionaries(sentence, 3)
+                    speakertrigrams = dict(Counter(speakertrigrams) + Counter(sentencetrigrams))
+                if sentencewordcount >= 4:
+                    sentencequadgrams = getngramdictionaries(sentence, 4)
+                    speakerquadgrams = dict(Counter(speakerquadgrams) + Counter(sentencequadgrams))
+                if sentencewordcount >= 5:
+                    sentencepentagrams = getngramdictionaries(sentence, 5)
+                    speakerpentagrams = dict(Counter(speakerpentagrams) + Counter(sentencepentagrams))
 
         # Once all transcript lines for this speaker have been processed, insert accumulator n-gram lists
         # into database

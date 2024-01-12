@@ -88,7 +88,7 @@ if __name__ == '__main__':
         # HACK:  Restarting with "WEST POINT SUPERINTENDENT GILLAND" (12/25/23)
         # HACK:  Restarting with first entry (01/08/24)
         # HACK:  Restarting with Adam Denenberg (3)
-        generate_ngrams.generate_ngrams(3)
+        generate_ngrams.generate_ngrams(1)
 
         exit()
     else:

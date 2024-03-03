@@ -10,7 +10,7 @@ class SenateData(SqlBase):
 
     # Get list of speakers
     def getspeakerlist(self):
-        query = "select id, speakername from code_speakernames order by speakername"
+        query = "select id, speakername from code_speakernames1 order by speakername"
         return self.select_all(query)
 
 
@@ -50,7 +50,7 @@ class SenateData(SqlBase):
 
     def getspeakerid(self, speakername):
 
-        query = "select id from code_speakernames where speakername='{0}'".format(speakername)
+        query = "select id from code_speakernames1 where speakername='{0}'".format(speakername)
         return self.select_one(query)
 
 

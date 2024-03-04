@@ -24,7 +24,7 @@ def remove_punctuation(input_string):
     return result
 
 
-def generate_ngrams(startingwithspeakerid):
+def generate_ngrams(startingwithspeakerid, endingwithspeakerid):
 
     sdb = SenateDB.SenateData()
 
@@ -33,7 +33,8 @@ def generate_ngrams(startingwithspeakerid):
 
     for speaker in speakerlist:
 
-        if speaker['id'] < startingwithspeakerid:
+        if not (speaker['id'] >= startingwithspeakerid and speaker['id'] <= endingwithspeakerid):
+            print("Skipping {0}".format(speaker['speakername']))
             continue
 
         starttime = datetime.datetime.now()

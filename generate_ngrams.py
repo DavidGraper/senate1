@@ -16,7 +16,7 @@ def remove_punctuation(input_string):
 
     # Make a translation table that maps all punctuation characters to None
     # translator = str.maketrans("", "", string.punctuation)
-    translator = str.maketrans("!?.-", "    ")
+    translator = str.maketrans(",$!?.-", "      ")
 
     # Apply the translation table to the input string
     result = input_string.translate(translator)
@@ -87,18 +87,37 @@ def generate_ngrams(startingwithspeakerid, endingwithspeakerid):
                 # Load accumulated n-gram listings
                 speakerunigrams = dict(Counter(speakerunigrams) + Counter(sentenceunigrams))
 
-                if sentencewordcount >= 2:
-                    sentencebigrams = getngramdictionaries(sentence, 2)
-                    speakerbigrams = dict(Counter(speakerbigrams) + Counter(sentencebigrams))
-                if sentencewordcount >= 3:
-                    sentencetrigrams = getngramdictionaries(sentence, 3)
-                    speakertrigrams = dict(Counter(speakertrigrams) + Counter(sentencetrigrams))
-                if sentencewordcount >= 4:
-                    sentencequadgrams = getngramdictionaries(sentence, 4)
-                    speakerquadgrams = dict(Counter(speakerquadgrams) + Counter(sentencequadgrams))
-                if sentencewordcount >= 5:
-                    sentencepentagrams = getngramdictionaries(sentence, 5)
-                    speakerpentagrams = dict(Counter(speakerpentagrams) + Counter(sentencepentagrams))
+                try:
+                    if sentencewordcount >= 2:
+                        sentencebigrams = getngramdictionaries(sentence, 2)
+                        speakerbigrams = dict(Counter(speakerbigrams) + Counter(sentencebigrams))
+                except:
+                    print("Error on getting bigrams for sentence = {0}".format(sentence))
+                    exit()
+
+                try:
+                    if sentencewordcount >= 3:
+                        sentencetrigrams = getngramdictionaries(sentence, 3)
+                        speakertrigrams = dict(Counter(speakertrigrams) + Counter(sentencetrigrams))
+                except:
+                    print("Error on getting trigrams for sentence = {0}".format(sentence))
+                    exit()
+
+                try:
+                    if sentencewordcount >= 4:
+                        sentencequadgrams = getngramdictionaries(sentence, 4)
+                        speakerquadgrams = dict(Counter(speakerquadgrams) + Counter(sentencequadgrams))
+                except:
+                    print("Error on getting quadgrams for sentence = {0}".format(sentence))
+                    exit()
+
+                try:
+                    if sentencewordcount >= 5:
+                        sentencepentagrams = getngramdictionaries(sentence, 5)
+                        speakerpentagrams = dict(Counter(speakerpentagrams) + Counter(sentencepentagrams))
+                except:
+                    print("Error on getting pentagrams for sentence = {0}".format(sentence))
+                    exit()
 
         # Once all transcript lines for this speaker have been processed, insert accumulator n-gram lists
         # into database

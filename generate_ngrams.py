@@ -127,15 +127,6 @@ def generate_ngrams(startingwithspeakerid, endingwithspeakerid):
         sdb.insertspeakerngrams(speaker["id"], speakerquadgrams, 4)
         sdb.insertspeakerngrams(speaker["id"], speakerpentagrams, 5)
 
-            # for speakertrigram in speakertrigrams:
-            #     sdb.insertspeakerngrams(speaker["id"], speakertrigrams, 3)
-            #
-            # for speakerbigram in speakerquadgrams:
-            #     sdb.insertspeakerngrams(speaker["id"], speakerquadgrams, 4)
-            #
-            # for speakertrigram in speakerpentagrams:
-            #     sdb.insertspeakerngrams(speaker["id"], speakerpentagrams, 5)
-
 
 def getngramdictionaries(textline, N):
 
